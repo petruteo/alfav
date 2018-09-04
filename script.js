@@ -1,13 +1,21 @@
 // var theURL = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=1min&apikey=30Y6LPCCQV16RA06";
-var theURL = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=FB&interval=1min&apikey=30Y6LPCCQV16RA06";
+apiKeys = ["181WZWBXFFYIPY99", "W7E0EWH7V30SXW0O", "PK6YJ2BT5GVLKS9H", "1QZMWT8HGNHYT57V", "OPL9S15RXJ83FE46"]; // "30Y6LPCCQV16RA06"
+var theURL = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=FB&interval=1min&apikey=";
 var theMarketURL = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=^GSPC&interval=1min&apikey=30Y6LPCCQV16RA06";
+var weeklyURL = "https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=MSFT&apikey=30Y6LPCCQV16RA06"
 
-var symbols100 = ["MSFT", "AMZN", "FB", "BRK.B", "JPM", "GOOG", "GOOGL", "JNJ", "XOM", "BAC", "V", "UNH", "WFC", "PFE", "T", "HD", "CVX", "VZ", "INTC", "CSCO", "PG", "MA", "BA", "MRK", "C", "KO", "NVDA", "CMCSA", "DIS", "DWDP", "NFLX", "PEP", "ABBV", "ORCL", "WMT", "AMGN", "ADBE", "MDT", "MCD", "MMM", "IBM", "PM", "HON", "ABT", "UNP", "MO", "GE", "TXN", "ACN", "CRM", "NKE", "PYPL", "COST", "QCOM", "LLY", "GILD", "BMY", "UTX", "TMO", "BKNG", "SLB", "LOW", "AVGO", "COP", "UPS", "USB", "GS", "CAT", "NEE", "LMT", "AXP", "CVS", "BIIB", "SBUX", "BDX", "EOG", "TJX", "ANTM", "PNC", "MS", "CELG", "AMT", "AET", "CSX", "AGN", "ADP", "DHR", "CB", "ISRG", "MDLZ", "OXY", "MU", "SCHW", "FDX", "CME", "BLK", "CL", "WBA", "CHTR"];
+var symbols100 = ["MSFT", "AMZN", "FB", "BRK-B", "JPM", "GOOG", "GOOGL", "JNJ", "XOM", "BAC", "V", "UNH", "WFC", "PFE", "T", "HD", "CVX", "VZ", "INTC", "CSCO", "PG", "MA", "BA", "MRK", "C", "KO", "NVDA", "CMCSA", "DIS", "DWDP", "NFLX", "PEP", "ABBV", "ORCL", "WMT", "AMGN", "ADBE", "MDT", "MCD", "MMM", "IBM", "PM", "HON", "ABT", "UNP", "MO", "GE", "TXN", "ACN", "CRM", "NKE", "PYPL", "COST", "QCOM", "LLY", "GILD", "BMY", "UTX", "TMO", "BKNG", "SLB", "LOW", "AVGO", "COP", "UPS", "USB", "GS", "CAT", "NEE", "LMT", "AXP", "CVS", "BIIB", "SBUX", "BDX", "EOG", "TJX", "ANTM", "PNC", "MS", "CELG", "AMT", "AET", "CSX", "AGN", "ADP", "DHR", "CB", "ISRG", "MDLZ", "OXY", "MU", "SCHW", "FDX", "CME", "BLK", "CL", "WBA", "CHTR"];
 
 var delay = 0;
 
-var linkCreator = (stockSymbol) => {
-  return "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" + stockSymbol + "&interval=1min&apikey=30Y6LPCCQV16RA06";
+var linkCreator = (stockSymbol, apiKeyArrPosition) => {
+  console.log(apiKeyArrPosition, "pozitie folosita pentru array");
+  return "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" + stockSymbol + "&interval=1min&apikey=" + apiKeys[apiKeyArrPosition];
+};
+
+var linkCreatorWeekly = (stockSymbol, apiKeyArrPosition) => {
+  console.log(apiKeyArrPosition, "pozitie folosita pentru array");
+  return "https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=" + stockSymbol + "&apikey=" + apiKeys[apiKeyArrPosition];
 };
 
 
@@ -106,9 +114,22 @@ function getValuesFromData(data) {
 // AJAX SUCCESS TO BE DELAYED
 
 function processAjaxCallToBeDelayed(data, url, symbolReceived) {
-  console.log(url, ", din doAjax");
+  var minute = new Date().getMinutes();
+  var secunde = new Date().getSeconds();
+  console.log(url, ", din doAjax, la minutul:", minute, ":", secunde);
 
   var symbol = symbolReceived // data['Meta Data']['2. Symbol']
+
+  stockValuesArray = getValuesFromData(data);
+  if (stockValuesArray.length == 0) {
+    //stockValuesArray = stockValuesArray.push((data));
+    console.log(data);
+    // doAjax(url, symbolReceived);
+
+  }
+  symbolDataArr.push(symbolReceived);
+  symbolDataArr.push(stockValuesArray);
+
   // symbolReceived = "FAKE";
   // var lastRefreshed = data['Meta Data']['3. Last Refreshed']
   // var lastTradePriceOnly = data['Time Series (1min)'][lastRefreshed]['4. close']
@@ -124,9 +145,7 @@ function processAjaxCallToBeDelayed(data, url, symbolReceived) {
   // $('#stockAsk').html(lastTradePriceOnly);
   // $('#stockVolume').html(lastVolume);
   // $("#stockIndicator").hide();
-  stockValuesArray = getValuesFromData(data);
-  symbolDataArr.push(symbolReceived);
-  symbolDataArr.push(stockValuesArray);
+
 }
 
 //--------------------------------------------------------
@@ -169,7 +188,7 @@ function doAjax(url, symbolReceived, delayExtender) {
     success: function (response) {
       setTimeout(function () {
         processAjaxCallToBeDelayed(response, url, symbolReceived);
-      }, delay++ * 20000);
+      }, delay++ * 0000);
     }
 
 
@@ -227,7 +246,7 @@ $(document).ready(function () {
 
     var stockValuesArray;
     var delay = 0;
-    doAjax(linkCreator(symbolArr[i]), symbolArr[i], i);
+    doAjax(linkCreatorWeekly(symbolArr[i], (i % 4)), symbolArr[i], i);
   }
 
   //--------------------------------------------------------
