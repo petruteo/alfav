@@ -3,6 +3,7 @@ apiKeys = ["181WZWBXFFYIPY99", "W7E0EWH7V30SXW0O", "PK6YJ2BT5GVLKS9H", "1QZMWT8H
 var theURL = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=FB&interval=1min&apikey=";
 var theMarketURL = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=^GSPC&interval=1min&apikey=30Y6LPCCQV16RA06";
 var weeklyURL = "https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=MSFT&apikey=30Y6LPCCQV16RA06"
+var worldDataHistoryURL = "https://www.worldtradingdata.com/api/v1/history?symbol=AAPL&sort=newest&api_token=demo"
 
 var symbols100 = ["MSFT", "AMZN", "FB", "BRK-B", "JPM", "GOOG", "GOOGL", "JNJ", "XOM", "BAC", "V", "UNH", "WFC", "PFE", "T", "HD", "CVX", "VZ", "INTC", "CSCO", "PG", "MA", "BA", "MRK", "C", "KO", "NVDA", "CMCSA", "DIS", "DWDP", "NFLX", "PEP", "ABBV", "ORCL", "WMT", "AMGN", "ADBE", "MDT", "MCD", "MMM", "IBM", "PM", "HON", "ABT", "UNP", "MO", "GE", "TXN", "ACN", "CRM", "NKE", "PYPL", "COST", "QCOM", "LLY", "GILD", "BMY", "UTX", "TMO", "BKNG", "SLB", "LOW", "AVGO", "COP", "UPS", "USB", "GS", "CAT", "NEE", "LMT", "AXP", "CVS", "BIIB", "SBUX", "BDX", "EOG", "TJX", "ANTM", "PNC", "MS", "CELG", "AMT", "AET", "CSX", "AGN", "ADP", "DHR", "CB", "ISRG", "MDLZ", "OXY", "MU", "SCHW", "FDX", "CME", "BLK", "CL", "WBA", "CHTR"];
 
@@ -85,12 +86,11 @@ function standardDeviation(data) {
 }
 
 //--------------------------------------------------------
-// FUNCTIONS AND DEFINITIONS
+// GET DATA FUNCTIONS AND DEFINITIONS
 //--------------------------------------------------------
 
-function numberWithCommas(x) {
-  return x.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ",");
-}
+
+//--------------------------------------------------------
 
 function getValuesFromData(data) {
   var timeSeries = data['Time Series (1min)'];
@@ -108,6 +108,45 @@ function getValuesFromData(data) {
   }
   // console.log("+++++", result);
   return closeEntries.reverse();
+}
+
+// getValuesFromDataWorldData
+
+function getValuesFromDataWorldData(data) {
+  var timeSeries = data['history'];
+  var result = [];
+  var closeEntries = [];
+
+  for (var key in timeSeries) {
+    if (timeSeries.hasOwnProperty(key)) {
+      result.push(timeSeries[key]);
+    }
+  }
+
+  for (i = 0; i < result.length; i++) {
+    closeEntries.push(parseFloat(result[i][Object.keys(result[i])[3]]).toFixed(4))
+  }
+  console.log("+++++", result);
+  return closeEntries.reverse();
+}
+
+//--------------------------------------------------------
+// Wait for elements
+
+function waitForElement() {
+  if ((symbolDataArr.length == symbolArr.length * 2)) {
+    //variable exists, do what you want
+    // console.log(symbolArr[i], "Stock value:", stockValuesArray);
+    // console.log("market index ETF = VOO:", stockMarketArray);
+    // var rho = pearsonCorrelation(stockValuesArray.map(x => parseFloat(x)), stockMarketArray.map(x => parseFloat(x)));
+    // console.log("- din script JS - Corelatia este: ", rho);
+    console.log("+++ data arr de arr ", symbolDataArr);
+    arrCorelator(symbolDataArr);
+
+  }
+  else {
+    setTimeout(waitForElement, 1500);
+  }
 }
 
 //--------------------------------------------------------
@@ -223,6 +262,31 @@ function doMarketAjax(url) {
 }
 
 //--------------------------------------------------------
+// GET MARKET REFERENCE DATA
+//--------------------------------------------------------
+function doWorldDataAjax(url) {
+  $.ajax({
+    url: url,
+    dataType: 'json',
+    contentType: "application/json",
+    success: function (data) {
+      stockMarketArray = getValuesFromDataWorldData(data);
+      console.log("** din functie market", stockMarketArray);
+
+      // return marketArray;
+
+    }
+  });
+}
+
+$.ajax({
+  dataType: "json",
+  url: url,
+  data: data,
+  success: success
+});
+
+//--------------------------------------------------------
 //--------------------------------------------------------
 //-------------------------MAIN STUFF-------------------------------
 //--------------------------------------------------------
@@ -238,39 +302,23 @@ $(document).ready(function () {
   symbolDataArr = [];
 
   //get the market array 
-  var stockMarketArray = doMarketAjax(theMarketURL);
+  // var stockMarketArray = doMarketAjax(theMarketURL);
 
   // get each stock and compare correlation with the market 
-  for (var i = 0; i < symbolArr.length; i++) {
-    // console.log("++", symbolArr[i], linkCreator(symbolArr[i]));
+  // for (var i = 0; i < symbolArr.length; i++) {
+  //   // console.log("++", symbolArr[i], linkCreator(symbolArr[i]));
 
-    var stockValuesArray;
-    var delay = 0;
-    doAjax(linkCreatorWeekly(symbolArr[i], (i % 4)), symbolArr[i], i);
-  }
+  //   var stockValuesArray;
+  //   var delay = 0;
+  //   doAjax(linkCreatorWeekly(symbolArr[i], (i % 4)), symbolArr[i], i);
+  // }
 
   //--------------------------------------------------------
   // WAIT FOR ELEMENTS AND THEN START CALCULATIONS
 
-  function waitForElement() {
-    if ((symbolDataArr.length == symbolArr.length * 2)) {
-      //variable exists, do what you want
-      // console.log(symbolArr[i], "Stock value:", stockValuesArray);
-      // console.log("market index ETF = VOO:", stockMarketArray);
-      // var rho = pearsonCorrelation(stockValuesArray.map(x => parseFloat(x)), stockMarketArray.map(x => parseFloat(x)));
-      // console.log("- din script JS - Corelatia este: ", rho);
-      console.log("+++ data arr de arr ", symbolDataArr);
-      arrCorelator(symbolDataArr);
+  // waitForElement();
 
-    }
-    else {
-      setTimeout(waitForElement, 1500);
-    }
-  }
-
-  waitForElement();
-
-
+  doWorldDataAjax(worldDataHistoryURL);
 
 
 });
@@ -288,3 +336,7 @@ $('.ajaxtrigger').click(function () {
   doAjax(theURL);
   return false;
 });
+
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ",");
+}
