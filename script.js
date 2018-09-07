@@ -3,7 +3,8 @@ apiKeys = ["181WZWBXFFYIPY99", "W7E0EWH7V30SXW0O", "PK6YJ2BT5GVLKS9H", "1QZMWT8H
 var theURL = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=FB&interval=1min&apikey=";
 var theMarketURL = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=^GSPC&interval=1min&apikey=30Y6LPCCQV16RA06";
 var weeklyURL = "https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=MSFT&apikey=30Y6LPCCQV16RA06"
-var worldDataHistoryURL = "https://www.worldtradingdata.com/api/v1/history?symbol=AAPL&sort=newest&api_token=demo"
+var worldDataHistoryURL = "https://www.worldtradingdata.com/api/v1/history?symbol=GOOG&sort=newest&api_token=wCkgn297Yi5vIlVNQDirTf4yTAhQa8mFePWPWjVirgxkm76UqPQAXv1jhOQp"
+// var worldDataHistoryURL = "https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=MSFT&apikey=30Y6LPCCQV16RA06"
 
 var symbols100 = ["MSFT", "AMZN", "FB", "BRK-B", "JPM", "GOOG", "GOOGL", "JNJ", "XOM", "BAC", "V", "UNH", "WFC", "PFE", "T", "HD", "CVX", "VZ", "INTC", "CSCO", "PG", "MA", "BA", "MRK", "C", "KO", "NVDA", "CMCSA", "DIS", "DWDP", "NFLX", "PEP", "ABBV", "ORCL", "WMT", "AMGN", "ADBE", "MDT", "MCD", "MMM", "IBM", "PM", "HON", "ABT", "UNP", "MO", "GE", "TXN", "ACN", "CRM", "NKE", "PYPL", "COST", "QCOM", "LLY", "GILD", "BMY", "UTX", "TMO", "BKNG", "SLB", "LOW", "AVGO", "COP", "UPS", "USB", "GS", "CAT", "NEE", "LMT", "AXP", "CVS", "BIIB", "SBUX", "BDX", "EOG", "TJX", "ANTM", "PNC", "MS", "CELG", "AMT", "AET", "CSX", "AGN", "ADP", "DHR", "CB", "ISRG", "MDLZ", "OXY", "MU", "SCHW", "FDX", "CME", "BLK", "CL", "WBA", "CHTR"];
 
@@ -265,26 +266,37 @@ function doMarketAjax(url) {
 // GET MARKET REFERENCE DATA
 //--------------------------------------------------------
 function doWorldDataAjax(url) {
+  // $.ajax({
+  //   url: url,
+  //   dataType: 'json',
+  //   contentType: "application/json",
+  //   success: function (data) {
+  //     stockMarketArray = getValuesFromDataWorldData(data);
+  //     console.log("** din functie market", stockMarketArray);
+
+  //     // return marketArray;
+
+  //   }
+  // });
+
   $.ajax({
     url: url,
-    dataType: 'json',
-    contentType: "application/json",
-    success: function (data) {
-      stockMarketArray = getValuesFromDataWorldData(data);
-      console.log("** din functie market", stockMarketArray);
+    type: "get", 
+    success: function(response) {
+        // console.log("** din functie market", response);
+        stockMarketArray = getValuesFromDataWorldData(response);
+        console.log("** din functie market", stockMarketArray);
 
-      // return marketArray;
+        return marketArray;
+    },
+    error: function(xhr) {
+        console.log("o eroare pe la server");
 
     }
   });
+
 }
 
-$.ajax({
-  dataType: "json",
-  url: url,
-  data: data,
-  success: success
-});
 
 //--------------------------------------------------------
 //--------------------------------------------------------
