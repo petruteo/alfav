@@ -281,16 +281,16 @@ function doWorldDataAjax(url) {
 
   $.ajax({
     url: url,
-    type: "get", 
-    success: function(response) {
-        // console.log("** din functie market", response);
-        stockMarketArray = getValuesFromDataWorldData(response);
-        console.log("** din functie market", stockMarketArray);
+    type: "get",
+    success: function (response) {
+      // console.log("** din functie market", response);
+      marketArray = getValuesFromDataWorldData(response);
+      // console.log("** din functie market", marketArray);
 
-        return marketArray;
+      return marketArray;
     },
-    error: function(xhr) {
-        console.log("o eroare pe la server");
+    error: function (xhr) {
+      console.log("o eroare pe la server");
 
     }
   });
@@ -330,7 +330,16 @@ $(document).ready(function () {
 
   // waitForElement();
 
-  doWorldDataAjax(worldDataHistoryURL);
+  var historicalDataArray = doWorldDataAjax(worldDataHistoryURL);
+
+  var database = firebase.database();
+  function writeUserData(stock, dataArr) {
+    firebase.database().ref('stocks/' + stock).set({
+      historicalData: dataArr
+    });
+  };
+
+  // writeUserData("AAPL", "historicalDataArray");
 
 
 });

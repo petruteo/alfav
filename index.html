@@ -3,6 +3,40 @@
 
 <head>
 
+
+  <script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyB0z3qF97l6Lbc42obthKgCjMlxbs5pAck",
+      authDomain: "stock-3d70c.firebaseapp.com",
+      databaseURL: "https://stock-3d70c.firebaseio.com",
+      projectId: "stock-3d70c",
+      storageBucket: "",
+      messagingSenderId: "213865539064"
+    };
+    firebase.initializeApp(config);
+
+
+    var database = firebase.database();
+
+    function writeUserData(stock, dataArr) {
+      firebase.database().ref('/' + stock).set({
+        historicalData: dataArr
+      });
+    };
+
+    firebase.database().ref('/stock/' + "VYn3M3Ttjwtm6uSJV8CE").once('value').then(function (snapshot) {
+      var stockData = (snapshot.val() && snapshot.val().username) || 'Anonymous';
+      console.log("din script head tag", stockData);
+
+      // ...
+    });
+
+    writeUserData("AAPL", "historicalDataArray");
+
+  </script>
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
   <!-- Latest compiled and minified CSS -->
@@ -39,17 +73,17 @@
 
       <div id="stock_left">
         <span class="stock_label">Price</span>
-        <br/>
+        <br />
         <strong class="stock_strong">$
           <span id="stockAsk"></span>
         </strong>
-        <br/>
+        <br />
       </div>
 
 
       <div id="stock_right">
         <span class="stock_label">Change</span>
-        <br/>
+        <br />
         <strong class="stock_strong">
           <span id="stockChange"></span>
         </strong>
@@ -68,21 +102,21 @@
 
       <div id="stock_body_content">
         <span class="stock_label">Volume</span>
-        <br/>
+        <br />
         <strong class="stock_strong">
           <span id="stockVolume"></span>
         </strong>
         <br />
         <br />
         <span class="stock_label">Average Daily Volume</span>
-        <br/>
+        <br />
         <strong class="stock_strong">
           <span id="stockAvgVolume"></span>
         </strong>
         <br />
         <br />
         <span class="stock_label">52 Week Range</span>
-        <br/>
+        <br />
         <strong class="stock_strong">
           <span id="stockRange"></span>
         </strong>
@@ -94,6 +128,16 @@
     </div>
 
     <script>
+
+      var database = firebase.database();
+      function writeUserData(stock, dataArr) {
+        firebase.database().ref('stocks/' + stock).set({
+          historicalData: dataArr
+        });
+      };
+
+      writeUserData("AAPL", "historicalDataArray");
+
       // function waitForElement() {
       //   if ((typeof stockValuesArray !== "undefined") && (typeof stockMarketArray !== "undefined")) {
       //     //variable exists, do what you want
